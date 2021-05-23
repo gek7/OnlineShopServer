@@ -13,11 +13,14 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using OnlineShopServerCore.Models;
+using System.IO;
+using System.Reflection;
 
 namespace OnlineShopServerCore
 {
     public class Startup
     {
+        public static string EnvDirectory = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -29,7 +32,7 @@ namespace OnlineShopServerCore
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddDbContext<OnlineShopContext>(options =>
+            services.AddDbContext<OnlineShopContext>(options => 
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddAuthentication(x =>
                 {
