@@ -23,5 +23,9 @@ namespace OnlineShopServerCore.Models
         public string image { get; set; }
         public string roleName { get; set; }
         public Nullable<System.DateTime> registerDate { get; set; }
+
+        
+        //Пользовательское неявное преобразование из User в JSONUser
+        public static explicit operator JSONUser(User u) => new JSONUser(u);
     }
 }

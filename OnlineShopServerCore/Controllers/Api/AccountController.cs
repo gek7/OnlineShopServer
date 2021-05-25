@@ -135,7 +135,8 @@ namespace OnlineShopServerCore.Controllers.Api
         }
 
         private OnlineShopServerCore.Models.User GetUser(string username, string password) => 
-            _context.Users.FirstOrDefault(user => user.Login == username && user.Password == password);
+            _context.Users.Include(u=>u.Role)
+            .FirstOrDefault(user => user.Login == username && user.Password == password);
 
         //Получение id и роли по логину и паролю
         private ClaimsIdentity GetIdentity(User person)
