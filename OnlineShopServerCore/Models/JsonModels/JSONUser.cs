@@ -7,22 +7,26 @@ namespace OnlineShopServerCore.Models
 {
     public class JSONUser
     {
-        public JSONUser(User u, string token = "")
+        public JSONUser()
         {
-            this.token = token;
+
+        }
+        public JSONUser(User u)
+        {
+            this.id = u.Id;
             this.firstName = u.FirstName;
             this.lastName = u.LastName;
             this.image = u.Image;
-            if(u.Role != null) this.roleName = u.Role.Name;
+            if(u.Role != null) this.role = u.Role;
             this.registerDate = u.RegisterDate;
         }
 
-        public string token { get; set; }
+        public long id { get; set; }
         public string firstName { get; set; }
         public string lastName { get; set; }
         public string image { get; set; }
-        public string roleName { get; set; }
-        public Nullable<System.DateTime> registerDate { get; set; }
+        public JsonRole role { get; set; }
+        public DateTime? registerDate { get; set; }
 
         
         //Пользовательское неявное преобразование из User в JSONUser

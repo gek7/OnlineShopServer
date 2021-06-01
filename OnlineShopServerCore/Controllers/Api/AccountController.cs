@@ -20,6 +20,7 @@ namespace OnlineShopServerCore.Controllers.Api
     [ApiController]
     public class AccountController : Controller
     {
+        //toDo регистрация
         private  OnlineShopContext _context;
 
         public AccountController(OnlineShopContext context)
@@ -41,6 +42,7 @@ namespace OnlineShopServerCore.Controllers.Api
             return users;
         }
 
+        //Авторизация
         [AllowAnonymous]
         [Route("auth")]
         [HttpPost]
@@ -69,7 +71,7 @@ namespace OnlineShopServerCore.Controllers.Api
                      var token = handler.CreateToken(descriptor);
 
                      //Сериализуем токен в строку и возвращаем клиенту
-                     return Ok(new JSONUser(AuthUser, handler.WriteToken(token)));
+                     return Ok(new JSONUserAuth(AuthUser, handler.WriteToken(token)));
                  }
                  return Unauthorized("Неверный логин или пароль");
              });
@@ -77,14 +79,16 @@ namespace OnlineShopServerCore.Controllers.Api
             return await response;
         }
 
+        //Информация об аккаунте
         [Route("info")]
         [HttpGet]
-        public async Task<ActionResult<JSONUser>> Info()
+        public async Task<ActionResult<JSONUserAuth>> Info()
         {
             User curUser = await _context.Users.Include(u=>u.Role).Where(u=>u.Id== GetId(User.Claims)).FirstAsync();
-            return new JSONUser(curUser);
+            return new JSONUserAuth(curUser);
         }
 
+        //Получение картинки
         [HttpGet("ProfileImage/{img}")]
         [AllowAnonymous]
         public ActionResult GetProfileImage(string img)
@@ -104,7 +108,7 @@ namespace OnlineShopServerCore.Controllers.Api
 
         [Route("setImage")]
         [HttpPost]
-        public async Task<IActionResult> AddFile([FromForm(Name ="file")] IFormFile uploadedFile)
+        public async Task<IActionResult> setImage([FromForm(Name ="file")] IFormFile uploadedFile)
         {
             User curUser = await _context.Users.FindAsync(GetId(User.Claims));
             if (uploadedFile != null)
