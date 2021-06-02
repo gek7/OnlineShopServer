@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using OnlineShopServerCore.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using static OnlineShopServerCore.HelperUtils;
@@ -95,6 +96,41 @@ namespace OnlineShopServerCore.Controllers.Api
                 _context.Users.Remove(u);
                 _context.SaveChanges();
             }
+        }
+
+        [Route("setImage")]
+        [HttpPost]
+        public async Task<IActionResult> setImage([FromQuery(Name = "id")]long id, [FromForm(Name = "file")] IFormFile uploadedFile)
+        {
+            if (uploadedFile != null && id != 0)
+            {
+                User curUser = await _context.Users.FindAsync(id);
+                if (curUser != null)
+                {
+                    string idName = curUser.Id + Path.GetExtension(uploadedFile.FileName);
+                    string path = Startup.EnvDirectory + "\\UsersImages\\" + idName;
+
+                    //Проверка есть ли папка для изображений пользователя
+                    if (!Directory.Exists(Startup.EnvDirectory + "/UsersImages/"))
+                    {
+                        Directory.CreateDirectory(Startup.EnvDirectory + "/UsersImages/");
+                    }
+                    //Проверка есть ли уже такое изображение
+                    if (System.IO.File.Exists(path))
+                    {
+                        System.IO.File.Delete(path);
+                    }
+
+                    using (var fileStream = new FileStream(path, FileMode.OpenOrCreate))
+                    {
+                        await uploadedFile.CopyToAsync(fileStream);
+                    }
+                    curUser.Image = idName;
+                    _context.SaveChanges();
+                    return Ok();
+                }
+            }
+            return BadRequest();
         }
 
         //Не выносим getRoles в отдельный контроллер, так как будем только получать все роли

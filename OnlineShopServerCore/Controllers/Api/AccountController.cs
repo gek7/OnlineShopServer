@@ -110,29 +110,10 @@ namespace OnlineShopServerCore.Controllers.Api
         [HttpPost]
         public async Task<IActionResult> setImage([FromForm(Name ="file")] IFormFile uploadedFile)
         {
-            User curUser = await _context.Users.FindAsync(GetId(User.Claims));
             if (uploadedFile != null)
             {
-                string idName = curUser.Id + Path.GetExtension(uploadedFile.FileName);
-                // путь до exe файла
-                string path = Startup.EnvDirectory + "\\UsersImages\\" + idName;
-
-                //Проверка есть ли папка для изображений пользователя
-                if (!Directory.Exists(Startup.EnvDirectory + "/UsersImages/")){
-                    Directory.CreateDirectory(Startup.EnvDirectory + "/UsersImages/");
-                }
-                //Проверка есть ли уже такое изображение
-                if (System.IO.File.Exists(path))
-                {
-                    System.IO.File.Delete(path);
-                }
-                
-                using (var fileStream = new FileStream(path, FileMode.OpenOrCreate))
-                {
-                    await uploadedFile.CopyToAsync(fileStream);
-                }
-                curUser.Image = idName;
-                _context.SaveChanges();
+                User curUser = await _context.Users.FindAsync(GetId(User.Claims));
+                HelperUtils.SaveImageForUser(curUser, uploadedFile, _context);
                 return Ok();
             }
             return BadRequest();
