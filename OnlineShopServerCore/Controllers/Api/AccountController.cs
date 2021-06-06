@@ -97,7 +97,7 @@ namespace OnlineShopServerCore.Controllers.Api
             /*if (String.IsNullOrEmpty(curUser.Image))
                 return BadRequest();*/
             // Путь к файлу
-            string file_path = Path.Combine(Startup.EnvDirectory + "\\UsersImages\\"+ img);
+            string file_path = Path.Combine(Startup.UserImagesPath + img);
             // Тип файла - content-type
             string file_type = "image/jpeg";
             // Имя файла - необязательно

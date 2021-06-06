@@ -14,10 +14,6 @@ namespace OnlineShopServerCore.Models
             if (String.IsNullOrWhiteSpace(user.password)) this.Password = user.password;
             this.FirstName = user.firstName;
             this.LastName = user.lastName;
-            if (user.image != null && ExistImage(user.image))
-            {
-                this.Image = user.image;
-            }
             this.RoleId = RoleId;
         }
     }

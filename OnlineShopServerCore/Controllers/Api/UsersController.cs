@@ -63,7 +63,7 @@ namespace OnlineShopServerCore.Controllers.Api
             }
             u.RoleId = user.role.id;
 
-            if (user.image != null && ExistImage(user.image))
+            if (user.image != null && ExistImage(Startup.UserImagesPath + user.image))
             {
                 u.Image = user.image;
             }
@@ -88,6 +88,7 @@ namespace OnlineShopServerCore.Controllers.Api
 
         //Удаление 
         [HttpDelete]
+        //TODO: Add check for using in other tables
         public void DeleteUser(long id)
         {
             User u = _context.Users.Find(id);
@@ -100,15 +101,21 @@ namespace OnlineShopServerCore.Controllers.Api
 
         [Route("setImage")]
         [HttpPost]
-        public async Task<IActionResult> setImage([FromQuery(Name = "id")]long id, [FromForm(Name = "file")] IFormFile uploadedFile)
+        public async Task<IActionResult> setImage([FromQuery(Name = "id")] long id, [FromForm(Name = "file")] IFormFile uploadedFile)
         {
-            if (uploadedFile != null && id != 0)
+            if (id != 0)
             {
                 User curUser = await _context.Users.FindAsync(id);
-                if (curUser != null)
+                if (uploadedFile == null)
+                {
+                    curUser.Image = null;
+                    _context.SaveChanges();
+                    return Ok();
+                }
+                else if (curUser != null)
                 {
                     string idName = curUser.Id + Path.GetExtension(uploadedFile.FileName);
-                    string path = Startup.EnvDirectory + "\\UsersImages\\" + idName;
+                    string path = Startup.UserImagesPath + idName;
 
                     //Проверка есть ли папка для изображений пользователя
                     if (!Directory.Exists(Startup.EnvDirectory + "/UsersImages/"))

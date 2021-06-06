@@ -10,17 +10,17 @@ namespace OnlineShopServerCore
 {
     public class HelperUtils
     {
-        public static bool ExistImage(string img) => System.IO.File.Exists(Startup.ImagesPath + img);
+        public static bool ExistImage(string path) => System.IO.File.Exists(path);
 
         public async static void SaveImageForUser(User curUser, IFormFile uploadedFile, OnlineShopContext _context)
         {
             string idName = curUser.Id + Path.GetExtension(uploadedFile.FileName);
-            string path = Startup.EnvDirectory + "\\UsersImages\\" + idName;
+            string path = Startup.UserImagesPath + idName;
 
             //Проверка есть ли папка для изображений пользователя
-            if (!Directory.Exists(Startup.EnvDirectory + "/UsersImages/"))
+            if (!Directory.Exists(Startup.UserImagesPath))
             {
-                Directory.CreateDirectory(Startup.EnvDirectory + "/UsersImages/");
+                Directory.CreateDirectory(Startup.UserImagesPath);
             }
             //Проверка есть ли уже такое изображение
             if (System.IO.File.Exists(path))

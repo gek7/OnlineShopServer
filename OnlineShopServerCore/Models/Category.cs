@@ -1,5 +1,7 @@
-﻿using System;
+﻿using OnlineShopServerCore.Models.JsonModels;
+using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 #nullable disable
 
