@@ -23,6 +23,8 @@ namespace OnlineShopServerCore
         public static string EnvDirectory = Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
         public static string UserImagesPath = Startup.EnvDirectory + "\\UsersImages\\";
         public static string CategoryImagesPath = Startup.EnvDirectory + "\\CategoriesImages\\";
+        public static string ItemImagesPath = Startup.EnvDirectory + "\\ItemsImages\\";
+        public static string baseUrl = "http://localhost:5000";
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;

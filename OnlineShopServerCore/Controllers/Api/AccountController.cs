@@ -46,7 +46,7 @@ namespace OnlineShopServerCore.Controllers.Api
         [AllowAnonymous]
         [Route("auth")]
         [HttpPost]
-        public async Task<ActionResult> Auth(string username, string password)
+        public async Task<ActionResult> Authorization(string username, string password)
         {
 
             Task<ActionResult> response = Task<ActionResult>.Factory.StartNew(() =>
@@ -113,7 +113,26 @@ namespace OnlineShopServerCore.Controllers.Api
             if (uploadedFile != null)
             {
                 User curUser = await _context.Users.FindAsync(GetId(User.Claims));
-                HelperUtils.SaveImageForUser(curUser, uploadedFile, _context);
+                string idName = curUser.Id + Path.GetExtension(uploadedFile.FileName);
+                string path = Startup.UserImagesPath + idName;
+
+                //Проверка есть ли папка для изображений пользователя
+                if (!Directory.Exists(Startup.UserImagesPath))
+                {
+                    Directory.CreateDirectory(Startup.UserImagesPath);
+                }
+                //Проверка есть ли уже такое изображение
+                if (System.IO.File.Exists(path))
+                {
+                    System.IO.File.Delete(path);
+                }
+
+                using (var fileStream = new FileStream(path, FileMode.OpenOrCreate))
+                {
+                    await uploadedFile.CopyToAsync(fileStream);
+                }
+                curUser.Image = idName;
+                _context.SaveChanges();
                 return Ok();
             }
             return BadRequest();
