@@ -56,6 +56,7 @@ namespace OnlineShopServerCore.Controllers.Api
             _context.OrderStatuses.Load();
             _context.Items.Load();
             _context.Categories.Load();
+            _context.Reviews.Load();
             return Ok(new JSONOrder(o));
         }
 
@@ -73,6 +74,7 @@ namespace OnlineShopServerCore.Controllers.Api
             _context.Items.Load();
             _context.Categories.Load();
             _context.OrderItems.Load();
+            _context.Reviews.Load();
             JSONOrder jsonOrder = null;
             if (Orders.Count() > 0) jsonOrder = Orders.Select(i=>new JSONOrder(i)).First();
             return Ok(jsonOrder);

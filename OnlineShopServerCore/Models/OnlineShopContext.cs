@@ -36,13 +36,13 @@ namespace OnlineShopServerCore.Models
         public virtual DbSet<User> Users { get; set; }
         public virtual DbSet<WishList> WishLists { get; set; }
 
-        /*protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer("Server=DESKTOP-VN3G900\\GEKPC;Initial Catalog=OnlineShop;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False");
+                optionsBuilder.UseSqlServer("Server=DESKTOP-VN3G900\\GEKPC;Database=OnlineShop;Trusted_Connection=True;");
             }
-        }*/
+        }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -197,11 +197,13 @@ namespace OnlineShopServerCore.Models
                 entity.HasOne(d => d.Item)
                     .WithMany(p => p.Reviews)
                     .HasForeignKey(d => d.ItemId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Reviews_Items");
 
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.Reviews)
                     .HasForeignKey(d => d.UserId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("FK_Reviews_Users");
             });
 

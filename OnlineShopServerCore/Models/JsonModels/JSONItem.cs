@@ -11,29 +11,31 @@ namespace OnlineShopServerCore.Models.JsonModels
         {
         }
 
-        public JSONItem(Item c, bool isCheckChildren = false)
+        public JSONItem(Item item, bool isCheckChildren = false)
         {
-            id = c.Id;
-            images = c.ItemImages.Select(img => (JSONImage)img).ToList();
-            description = c.Description;
-            price = c.Price;
-            if(c.Category != null) category = (JSONCategory) c.Category;
-            count = c.Count;
-            name = c.Name;
-            if (c.OwnerNavigation != null && c.Id != c.Owner && !isCheckChildren)
+            id = item.Id;
+            images = item.ItemImages.Select(img => (JSONImage)img).ToList();
+            description = item.Description;
+            price = item.Price;
+            if(item.Category != null) category = (JSONCategory)item.Category;
+            count = item.Count;
+            name = item.Name;
+            if (item.OwnerNavigation != null && item.Id != item.Owner && !isCheckChildren)
             {
-                owner = new JSONItem(c.OwnerNavigation);
+                owner = new JSONItem(item.OwnerNavigation);
             }
-            if (c.InverseOwnerNavigation != null && isCheckChildren)
+            if (item.InverseOwnerNavigation != null && isCheckChildren)
             {
-                items = c.InverseOwnerNavigation.Select(cat => new JSONItem(cat, isCheckChildren)).ToList();
+                items = item.InverseOwnerNavigation.Select(cat => new JSONItem(cat, isCheckChildren)).ToList();
             }
+            if(item.Reviews.Count > 0) avgRating = item.Reviews.Average(r => r.ItemMark);
         }
 
         public long id { get; set; }
         public string name { get; set; }
         public string description { get; set; }
         public decimal? price { get; set; }
+        public double avgRating { get; set; }
         public JSONCategory category { get; set; }
         public int? count { get; set; }
         public JSONItem owner { get; set; }

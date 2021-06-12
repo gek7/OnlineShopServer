@@ -160,7 +160,7 @@ namespace OnlineShopServerCore.Controllers.Api
             string file_path = Path.Combine(Startup.CategoryImagesPath + img);
             if (!HelperUtils.ExistImage(file_path))
             {
-                file_path = Startup.CategoryImagesPath + "CategoryPhoto.jpg";
+                file_path = Startup.CategoryImagesPath + "DefaultCategoryPhoto.jpg";
             }
             // Тип файла - content-type
             string file_type = "image/jpeg";
