@@ -4,6 +4,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace OnlineShopServerCore
@@ -11,30 +14,24 @@ namespace OnlineShopServerCore
     public class HelperUtils
     {
         public static bool ExistImage(string path) => System.IO.File.Exists(path);
-
-        public async static void SaveImageForUser(User curUser, IFormFile uploadedFile, OnlineShopContext _context)
+        public static string GetMD5Hash(string str)
         {
-            string idName = curUser.Id + Path.GetExtension(uploadedFile.FileName);
-            string path = Startup.UserImagesPath + idName;
-
-            //Проверка есть ли папка для изображений пользователя
-            if (!Directory.Exists(Startup.UserImagesPath))
+            if (!HelperUtils.IsMD5(str))
             {
-                Directory.CreateDirectory(Startup.UserImagesPath);
+                var md5 = MD5.Create();
+                var hash = md5.ComputeHash(Encoding.UTF8.GetBytes(str));
+                return Convert.ToBase64String(hash);
             }
-            //Проверка есть ли уже такое изображение
-            if (System.IO.File.Exists(path))
+            return str;
+        }
+        public static bool IsMD5(string input)
+        {
+            if (String.IsNullOrEmpty(input))
             {
-                System.IO.File.Delete(path);
+                return false;
             }
 
-            using (var fileStream = new FileStream(path, FileMode.OpenOrCreate))
-            {
-                await uploadedFile.CopyToAsync(fileStream);
-            }
-            curUser.Image = idName;
-            _context.SaveChanges();
-
+            return Regex.IsMatch(input, "^[0-9a-fA-F]{32}$", RegexOptions.Compiled);
         }
     }
 }

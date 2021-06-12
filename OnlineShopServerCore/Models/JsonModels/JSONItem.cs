@@ -11,12 +11,19 @@ namespace OnlineShopServerCore.Models.JsonModels
         {
         }
 
-        public JSONItem(Item item, bool isCheckChildren = false)
+        public JSONItem(Item item, bool isCheckChildren = false, decimal? customPrice = -1)
         {
             id = item.Id;
             images = item.ItemImages.Select(img => (JSONImage)img).ToList();
             description = item.Description;
-            price = item.Price;
+            if(customPrice<0)
+            {
+                price = item.Price;
+            }
+            else
+            {
+                price = customPrice;
+            }
             if(item.Category != null) category = (JSONCategory)item.Category;
             count = item.Count;
             name = item.Name;

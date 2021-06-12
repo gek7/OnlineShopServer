@@ -12,6 +12,9 @@ using Newtonsoft.Json;
 using OnlineShopServerCore.Models;
 using System.IO;
 using Microsoft.EntityFrameworkCore;
+using OnlineShopServerCore.Models.JsonModels;
+using System.Security.Cryptography;
+using System.Text.RegularExpressions;
 
 namespace OnlineShopServerCore.Controllers.Api
 {
@@ -32,12 +35,14 @@ namespace OnlineShopServerCore.Controllers.Api
         [AllowAnonymous]
         [Route("auth")]
         [HttpPost]
-        public async Task<ActionResult> Authorization(string username, string password)
+        public async Task<ActionResult> Authorization(JSONAuthData auth)
         {
 
             Task<ActionResult> response = Task<ActionResult>.Factory.StartNew(() =>
              {
-                 var AuthUser = GetUser(username, password);
+                 auth.password = HelperUtils.GetMD5Hash(auth.password);
+                 var AuthUser = GetUser(auth.username, auth.password);
+                 
                  if (AuthUser != null)
                  {
                      string token = GetTokenByUser(AuthUser);
@@ -146,7 +151,7 @@ namespace OnlineShopServerCore.Controllers.Api
             u.FirstName = user.firstName;
             u.LastName = user.lastName;
             u.Login = user.login;
-            u.Password = user.password;
+            u.Password = HelperUtils.GetMD5Hash(user.password);
             u.RoleId = 2;
             if (string.IsNullOrEmpty(u.FirstName) || string.IsNullOrEmpty(u.LastName))
             {

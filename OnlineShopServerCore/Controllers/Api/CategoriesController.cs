@@ -171,7 +171,7 @@ namespace OnlineShopServerCore.Controllers.Api
 
         [Route("setImage")]
         [HttpPost]
-        public async Task<IActionResult> setImage([FromQuery(Name = "id")] long id, [FromForm(Name = "file")] IFormFile uploadedFile)
+        public async Task<IActionResult> SetCategoryImage([FromQuery(Name = "id")] long id, [FromForm(Name = "file")] IFormFile uploadedFile)
         {
             if (id != 0)
             {
@@ -186,18 +186,15 @@ namespace OnlineShopServerCore.Controllers.Api
                 {
                     string idName = curCategory.Id + Path.GetExtension(uploadedFile.FileName);
                     string path = Startup.CategoryImagesPath + idName;
-
                     //Проверка есть ли папка для изображений пользователя
                     if (!Directory.Exists(Startup.EnvDirectory + "/CategoriesImages/"))
-                    {
                         Directory.CreateDirectory(Startup.EnvDirectory + "/CategoriesImages/");
-                    }
+                    
                     //Проверка есть ли уже такое изображение
                     if (System.IO.File.Exists(path))
                     {
                         System.IO.File.Delete(path);
                     }
-
                     using (var fileStream = new FileStream(path, FileMode.OpenOrCreate))
                     {
                         await uploadedFile.CopyToAsync(fileStream);
@@ -208,6 +205,125 @@ namespace OnlineShopServerCore.Controllers.Api
                 }
             }
             return BadRequest();
+        }
+
+        [HttpGet("CategoryAttributes")]
+        [AllowAnonymous]
+        public ActionResult<List<JsonReview>> CategoryAttributesById(long categoryId)
+        {
+            var Attrs = _context.CategoryAttributes
+                .Include(c => c.Type)
+                .Where(r => r.CategoryId == categoryId).ToList();
+            List<JSONCategoryAttribute> jsonAttrs = new List<JSONCategoryAttribute>();
+            if (Attrs.Count > 0)
+            {
+                jsonAttrs = Attrs.Select(attr => new JSONCategoryAttribute(attr)).ToList();
+            }
+            return Ok(jsonAttrs);
+        }
+
+        [HttpGet("CategoryAttribute")]
+        [AllowAnonymous]
+        public ActionResult<JSONCategoryAttribute> GetCategoryAttribute(long attrId)
+        {
+            var Attr = _context.CategoryAttributes
+                .Include(c => c.Type)
+                .Where(r => r.Id == attrId).FirstOrDefault();
+            if (Attr == null)
+            {
+                return BadRequest("Атрибут не найден");
+            }
+            return Ok(new JSONCategoryAttribute(Attr));
+        }
+        //Добавление
+        [HttpPut("CategoryAttribute")]
+        public ActionResult<JSONCategoryAttribute> AddCategoryAttributes(JSONCategoryAttribute attr)
+        {
+            CategoryAttribute c = new CategoryAttribute();
+            c.Name = attr.name;
+            if (_context.CategoryAttributesTypes.Find(attr.attrType.id) != null)
+            {
+                c.TypeId = attr.attrType.id;
+            }
+            else
+            {
+                return BadRequest("Тип атрибута не найден");
+            }
+            if (_context.Categories.Find(attr.category) != null)
+            {
+                c.CategoryId = attr.category;
+            }
+            else
+            {
+                return BadRequest("Категория не найдена");
+            }
+
+            _context.CategoryAttributes.Add(c);
+            _context.SaveChanges();
+            return Ok(new JSONCategoryAttribute(c));
+        }
+
+        //Изменение
+        [HttpPost("CategoryAttribute")]
+        public ActionResult<JSONCategoryAttribute> PatchCategoryAttributes(JSONCategoryAttribute Category)
+        {
+            CategoryAttribute DatabaseCategoryAttr = _context.CategoryAttributes
+                .Include(c => c.Type)
+                .Where(c => c.Id == Category.id).FirstOrDefault();
+            if (DatabaseCategoryAttr != null)
+            {
+                DatabaseCategoryAttr.Name = Category.name;
+                if(Category.attrType != null && _context.CategoryAttributesTypes.Find(Category.attrType.id) != null )
+                {
+                    DatabaseCategoryAttr.TypeId = Category.attrType.id;
+                }
+                else
+                {
+                    BadRequest("Не заполнен тип атрибута");
+                }
+                _context.SaveChanges();
+                return Ok(new JSONCategoryAttribute(DatabaseCategoryAttr));
+            }
+            return BadRequest();
+        }
+
+        //Удаление 
+        [HttpDelete("CategoryAttribute")]
+        public ActionResult DeleteCategoryAttributes(long id)
+        {
+            CategoryAttribute c = _context.CategoryAttributes.Find(id);
+            if (c != null)
+            {
+                try
+                {
+                    _context.CategoryAttributes.Remove(c);
+                    _context.SaveChanges();
+                    return Ok();
+                }
+                catch (Exception e)
+                {
+                    if (((SqlException)e.InnerException).ErrorCode == -2146232060)
+                    {
+                        return BadRequest("Запись используется в других местах");
+                    }
+                    else
+                    {
+                        return BadRequest(e.Message);
+                    }
+                }
+            }
+            return BadRequest("Не найден атрибут");
+        }
+
+        [HttpGet("CategoryAttributes/types")]
+        [AllowAnonymous]
+        public ActionResult<List<JSONCategoryAttributeType>> CategoryAttributesTypes()
+        {
+            var attrTypes = _context.CategoryAttributesTypes.ToList();
+            var JsonAttrsTypes = new List<JSONCategoryAttributeType>();
+            if (attrTypes.Count > 0)
+                JsonAttrsTypes.AddRange(attrTypes.Select(t => new JSONCategoryAttributeType(t)));
+            return Ok(JsonAttrsTypes);
         }
     }
 }

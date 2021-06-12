@@ -110,7 +110,6 @@ namespace OnlineShopServerCore.Controllers.Api
         [AllowAnonymous]
         public ActionResult<JSONItem> GetItem(long id)
         {
-            //Возможно преобразовать модель базы данных в json модель, благодаря определению неявного преобразования в JSONItem
             var jsonItem = _context.Items
                 .Include(c => c.OwnerNavigation)
                 .Include(c => c.InverseOwnerNavigation)
@@ -132,7 +131,6 @@ namespace OnlineShopServerCore.Controllers.Api
         [Authorize(Roles = "Administrator")]
         public ActionResult<List<JSONItem>> GetItemChilds(long id)
         {
-            //Возможно преобразовать модель базы данных в json модель, благодаря определению неявного преобразования в JSONItem
             var Items = _context.Items
                .Include(i => i.OwnerNavigation)
                .Include(i => i.InverseOwnerNavigation)
@@ -140,7 +138,7 @@ namespace OnlineShopServerCore.Controllers.Api
             Items.Load();
             _context.Categories.Load();
             _context.Reviews.Load();
-            var jsonItems = Items.Where(i => i.Owner == id).Select(i => new JSONItem(i, true)).ToList();
+            var jsonItems = Items.Where(i => i.Owner == id).Select(i => new JSONItem(i, true, -1)).ToList();
             if (jsonItems.Count() > 0)
             {
                 return Ok(jsonItems);

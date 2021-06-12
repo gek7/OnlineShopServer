@@ -24,7 +24,7 @@ namespace OnlineShopServerCore.Models.JsonModels
                 items = new List<JSONItem>();
                 foreach (var item in o.OrderItems)
                 {
-                    items.Add(new JSONItem(item.Item));
+                    items.Add(new JSONItem(item.Item, false, item.Price));
                 }
             }
         }
