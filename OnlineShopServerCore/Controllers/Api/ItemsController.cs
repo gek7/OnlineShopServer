@@ -375,5 +375,121 @@ namespace OnlineShopServerCore.Controllers.Api
                 });
             }
         }
+
+        [HttpGet("ItemAttributes")]
+        [AllowAnonymous]
+        public ActionResult<List<JSONItemAttribute>> ItemsAttributesById(long itemId)
+        {
+            var Attrs = _context.ItemAttributes
+                .Include(c => c.ItemAttributesValues)
+                .ThenInclude(c=>c.Unit)
+                .Include(a => a.CategoryAttributes)
+                .ThenInclude(a => a.Type)
+                .Where(a => a.ItemId == itemId).ToList();
+            List<JSONItemAttribute> jsonAttrs = new List<JSONItemAttribute>();
+            if (Attrs.Count > 0)
+            {
+                jsonAttrs = Attrs.Select(attr => new JSONItemAttribute(attr)).ToList();
+            }
+            return Ok(jsonAttrs);
+        }
+
+        [HttpGet("ItemAttribute")]
+        [AllowAnonymous]
+        public ActionResult<JSONItemAttribute> GetItemAttribute(long attrId)
+        {
+            var Attr = _context.ItemAttributes
+                .Include(a => a.ItemAttributesValues)
+                .ThenInclude(a=>a.Unit)
+                .Include(a=>a.CategoryAttributes)
+                .ThenInclude(a=>a.Type)
+                .Where(a => a.Id == attrId).FirstOrDefault();
+            if (Attr == null)
+            {
+                return BadRequest("Атрибут не найден");
+            }
+            return Ok(new JSONItemAttribute(Attr));
+        }
+
+        //Добавление атрибута
+        [HttpPut("ItemAttribute")]
+        public ActionResult<JSONItemAttribute> AddItemAttributes(JSONItemAttribute attr)
+        {
+            ItemAttribute newAttribute = new ItemAttribute();
+            string error = newAttribute.PatchFromRequest(attr, ref _context);
+            if (error != null){
+                return BadRequest(error);
+            }
+
+            _context.ItemAttributes.Add(newAttribute);
+            _context.SaveChanges();
+            return Ok(new JSONItemAttribute(newAttribute));
+        }
+
+        //Изменение атрибута
+        [HttpPost("ItemAttribute")]
+        public ActionResult<JSONItemAttribute> PatchCategoryAttributes(JSONItemAttribute attr)
+        {
+            var EditingItemAttr = _context.ItemAttributes
+                .Include(a => a.ItemAttributesValues)
+                .ThenInclude(a => a.Unit)
+                .Include(a => a.CategoryAttributes)
+                .ThenInclude(a => a.Type)
+                .Where(a => a.Id == attr.id).FirstOrDefault();
+            if (EditingItemAttr != null)
+            {
+                string error = EditingItemAttr.PatchFromRequest(attr, ref _context);
+                if (error != null)
+                {
+                    return BadRequest(error);
+                }
+                _context.SaveChanges();
+                return Ok(new JSONItemAttribute(EditingItemAttr));
+            }
+            return BadRequest();
+        }
+
+        //Удаление атрибута
+        [HttpDelete("ItemAttribute")]
+        public ActionResult DeleteItemAttribute(long id)
+        {
+            ItemAttribute attr = _context.ItemAttributes
+                .Include(i=>i.ItemAttributesValues)
+                .Where(i=>i.Id == id).FirstOrDefault();
+            if (attr != null)
+            {
+                try
+                {
+                    _context.ItemAttributes.Remove(attr);
+                    _context.SaveChanges();
+                    return Ok();
+                }
+                catch (Exception e)
+                {
+                    if (((SqlException)e.InnerException).ErrorCode == -2146232060)
+                    {
+                        return BadRequest("Запись используется в других местах");
+                    }
+                    else
+                    {
+                        return BadRequest(e.Message);
+                    }
+                }
+            }
+            return BadRequest("Не найден атрибут");
+        }
+
+        [HttpGet("ItemAttribute/Units")]
+        [AllowAnonymous]
+        public ActionResult<List<JSONUnit>> GetUnits()
+        {
+            var units = _context.Units.ToList();
+            var jsonUnits = new List<JSONUnit>();
+            if(units.Count > 0)
+            {
+                jsonUnits = units.Select(u => new JSONUnit(u)).ToList();
+            }
+            return Ok(jsonUnits);
+        }
     }
 }

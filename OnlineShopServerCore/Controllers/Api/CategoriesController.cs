@@ -235,7 +235,8 @@ namespace OnlineShopServerCore.Controllers.Api
             }
             return Ok(new JSONCategoryAttribute(Attr));
         }
-        //Добавление
+
+        //Добавление атрибута
         [HttpPut("CategoryAttribute")]
         public ActionResult<JSONCategoryAttribute> AddCategoryAttributes(JSONCategoryAttribute attr)
         {
@@ -263,7 +264,7 @@ namespace OnlineShopServerCore.Controllers.Api
             return Ok(new JSONCategoryAttribute(c));
         }
 
-        //Изменение
+        //Изменение атрибута
         [HttpPost("CategoryAttribute")]
         public ActionResult<JSONCategoryAttribute> PatchCategoryAttributes(JSONCategoryAttribute Category)
         {
@@ -287,7 +288,7 @@ namespace OnlineShopServerCore.Controllers.Api
             return BadRequest();
         }
 
-        //Удаление 
+        //Удаление атрибута
         [HttpDelete("CategoryAttribute")]
         public ActionResult DeleteCategoryAttributes(long id)
         {
