@@ -12,6 +12,7 @@ namespace OnlineShopServerCore.Models
         {
             if (!String.IsNullOrWhiteSpace(user.login)) this.Login = user.login;
             if (!String.IsNullOrWhiteSpace(user.password)) this.Password = HelperUtils.GetMD5Hash(user.password);
+            this.Image = user.image;
             this.FirstName = user.firstName;
             this.LastName = user.lastName;
             this.RoleId = RoleId;

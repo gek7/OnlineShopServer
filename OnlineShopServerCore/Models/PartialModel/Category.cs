@@ -11,8 +11,15 @@ namespace OnlineShopServerCore.Models
         public void PatchFromRequest(JSONCategoryServer category)
         {
             this.Name = category.name;
+            this.Image = category.image;
             if(category.owner != null)
+            {
                 this.Owner = category.owner.id;
+            }
+            else
+            {
+                this.Owner = null;
+            }
         }
     }
 }
