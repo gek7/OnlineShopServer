@@ -89,13 +89,25 @@ namespace OnlineShopServerCore.Controllers.Api
         //Удаление 
         [HttpDelete]
         //TODO: Add check for using in other tables
-        public void DeleteUser(long id)
+        public ActionResult DeleteUser(long id)
         {
             User u = _context.Users.Find(id);
             if (u != null)
             {
-                _context.Users.Remove(u);
-                _context.SaveChanges();
+                try
+                {
+                    _context.Users.Remove(u);
+                    _context.SaveChanges();
+                    return Ok();
+                }
+                catch
+                {
+                    return BadRequest("Ошибка удаления");
+                }
+            }
+            else
+            {
+                return BadRequest("Пользователь не найден");
             }
         }
 

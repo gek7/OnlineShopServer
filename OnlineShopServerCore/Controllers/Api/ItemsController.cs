@@ -62,6 +62,23 @@ namespace OnlineShopServerCore.Controllers.Api
             return Ok(jsonItems);
         }
 
+        [HttpGet("SearchItems")]
+        [AllowAnonymous]
+        public ActionResult<List<JSONItem>> GetItemsBySearch(string search)
+        {
+            var Items = _context.Items
+                .Include(i => i.OwnerNavigation)
+                .Include(i => i.InverseOwnerNavigation)
+                .Include(i => i.ItemImages)
+                .Where(item=>item.Name.Contains(search))
+                .Take(10);
+            Items.Load();
+            _context.Categories.Load();
+            _context.Reviews.Load();
+            var jsonItems = Items.Select(i => (JSONItem)i).ToList();
+            return Ok(jsonItems);
+        }
+
         [HttpPost("getItemsByIds")]
         [AllowAnonymous]
         public ActionResult<List<JSONItem>> GetItemsByIds(List<long> ids)

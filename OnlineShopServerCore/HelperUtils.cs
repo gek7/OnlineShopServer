@@ -59,6 +59,9 @@ namespace OnlineShopServerCore
                         case "string":
                             result = String.IsNullOrWhiteSpace(value) ? null : value;
                             break;
+                        case "bool":
+                            result = Boolean.Parse(value);
+                            break;
                         case "enum":
                             long id = Int32.Parse(value);
                             result = context.Find<EnumCategoryAttributesValue>(id);

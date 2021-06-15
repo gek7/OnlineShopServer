@@ -13,11 +13,12 @@ namespace OnlineShopServerCore.Models.JsonModels
 
         public JSONOrder(Order o)
         {
+            id = o.Id;
             orderNum = o.OrderNum;
             phoneNumber = o.PhoneNumber;
             deliveryAddress = o.DeliveryAddress;
             orderStatus = new JSONStatus(o.OrderStatus);
-            if (user != null)
+            if (o.User != null)
                 user = new JSONUser(o.User);
             if(o.OrderItems != null)
             {
@@ -28,6 +29,7 @@ namespace OnlineShopServerCore.Models.JsonModels
                 }
             }
         }
+        public long id { get; set; }
         public string orderNum { get; set; }
         public string phoneNumber { get; set; }
         public string deliveryAddress { get; set; }
